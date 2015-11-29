@@ -1,0 +1,9 @@
+color: 0 151 0;
+ledges:
+400; 400; 100; 50; (ledges are 'x; y; width; length;'. can have any number of ledges, within reason :D)
+100; 400; 100; 50;
+10; 60; 100; 5;
+npcs:
+enemies/pelvicMan; (list npc info files followed by ';'. can have any number as well, but beware of lag)
+enemies/pelvicManMinion;
+enemies/pelvicManMinion;

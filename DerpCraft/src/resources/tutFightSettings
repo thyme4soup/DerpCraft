@@ -1,0 +1,6 @@
+color: 0 151 0;
+ledges:
+400; 400; 100; 50; (ledges are 'x; y; width; length;'. can have any number of ledges, within reason :D)
+100; 400; 100; 50;
+npcs:
+redWizFight;

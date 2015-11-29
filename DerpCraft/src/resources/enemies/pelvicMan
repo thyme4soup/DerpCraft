@@ -1,0 +1,6 @@
+ManLeft.png; 50; 50; -1; (image, width, length, id (id is like a radio channel, the npcs spells do not hit those with the same id))
+500; 640; (load starting coords)
+60; (health)
+spells: (spell is selected randomly to be fired)
+aaa
+poisonSpell

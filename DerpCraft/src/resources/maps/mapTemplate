@@ -1,0 +1,7 @@
+0 153 0; Background: either "file: IMAGENAME;" or "R G B;" values for single color background. images must be in "resources folder." this current background is an rgb color of 0, 153, 0
+0; 1; 1;	(this is a tree at coordinates 1, 1. template is 0; xcoord; ycoord)
+1; 9; 0; 9; 18; firstMap;		(this is a door to another map at 9, 0, spawning the character at 9, 18, on the map firstMap. template is 1; xcord; ycord; xdest; ydest; mapName)
+2; 3; 3;	(this is a path, an enterable square with a rock thingy in it at 3, 3. template is 2; xcord; ycord)
+3; 10; 15; treeasian.png;	(this is an enterable image, simply an image that can be walked over at 4, 4. template is 3; xcord; ycord; imageName)
+4; 11; 15; treered.png; (same syntax as enterable image, only resulting image is non-enterable)
+5; 10; 12; Man.png; cutscene; fight; (coords followed by map tile, cutscene, and fight info. see templates for cutscene and fight)
