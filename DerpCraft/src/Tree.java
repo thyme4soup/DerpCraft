@@ -1,34 +1,31 @@
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
+
 import javax.swing.JPanel;
 
 public class Tree
-  extends JPanel
+  extends Entity
 {
-  public boolean isEnterable = false;
-  public boolean interact = false;
-  public Point gridCoords;
+	public static final int TYPE = 0;
   
-  public Tree(Dimension size, Point gridCoords)
+  public Tree(Point gridCoords)
   {
-    this.gridCoords = gridCoords;
-    setLayout(null);
-    setSize(size);
-    setVisible(true);
-    setOpaque(false);
-    ImagePanel image = new ImagePanel(getSize());
-    image.setImageWithName("treegreen.png");
-    add(image);
+	  super(gridCoords);
+	  type = 0;
+	  isEnterable = false;
+	  isInteractable = false;
+	  image.setImageWithName("treegreen.png");
   }
   
-  public static Entity loadEntity(String c, Point[][] grid)
+  public static Tree loadEntity(String c)
   {
     int[] coords = MainClass.loadCoords(c);
-    return new Entity(new Point(coords[0], coords[1]), 0, grid);
+    return new Tree(new Point(coords[0], coords[1]));
   }
   
-  public void interact() {}
-  
+  @Override
   public String getString()
   {
     String temp = "";

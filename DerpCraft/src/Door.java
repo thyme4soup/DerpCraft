@@ -4,31 +4,21 @@ import java.awt.Point;
 import java.io.PrintStream;
 import javax.swing.JPanel;
 
-public class Door
-  extends JPanel
-{
-  public boolean isEnterable = true;
-  public boolean interact = true;
+public class Door extends Entity	{
+	public static final int TYPE = 1;
   public String toMap;
-  public Point[][] grid;
   public Point gridDestination;
-  public Point gridCoords;
   
-  public Door(Dimension size, String toMapName, Point location, Point[][] aGrid)
+  public Door(Point gridCoords, String toMapName, Point toLocation)
   {
-    setLayout(null);
-    setSize(size);
-    setVisible(true);
-    setOpaque(false);
-    this.gridCoords = location;
+	 super(gridCoords);
+	 isEnterable = true;
     this.toMap = toMapName;
-    this.grid = aGrid;
-    ImagePanel image = new ImagePanel(getSize());
+    this.gridDestination = toLocation;
     image.setImageAsText("Door", Color.white);
-    add(image);
   }
   
-  public static Entity loadEntity(String c, Point[][] grid)
+  public static Entity loadEntity(String c)
   {
     String temp = "";
     int n = 0;
@@ -59,12 +49,11 @@ public class Door
     }
     n += 2;
     
-    Entity tempDoor = new Entity(new Point(coords[0], coords[1]), 1, grid);
-    tempDoor.door.toMap = temp;
-    tempDoor.door.gridDestination = new Point(destX, destY);
+    Entity tempDoor = new Door(new Point(coords[0], coords[1]), temp, new Point(destX, destY));
     return tempDoor;
   }
   
+  @Override
   public void interact(GamePanel panel, Char aChar)
   {
     aChar.changeLocation(this.gridDestination);
@@ -75,7 +64,7 @@ public class Door
   public String getString()
   {
     String temp = "";
-    temp = String.format("%d; %d; %d; %d; %d; %s;", new Object[] { Integer.valueOf(1), Integer.valueOf(this.gridCoords.x), Integer.valueOf(this.gridCoords.y), Integer.valueOf(this.gridDestination.x), Integer.valueOf(this.gridDestination.y), this.toMap });
+    temp = String.format("%d; %d; %d; %d; %d; %s;", new Object[] { Integer.valueOf(TYPE), Integer.valueOf(this.gridCoords.x), Integer.valueOf(this.gridCoords.y), Integer.valueOf(this.gridDestination.x), Integer.valueOf(this.gridDestination.y), this.toMap });
     return temp;
   }
 }

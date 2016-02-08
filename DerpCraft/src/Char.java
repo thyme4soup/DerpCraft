@@ -1,14 +1,16 @@
+import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import javax.swing.JPanel;
 
 public class Char
-  extends JPanel
 {
   int x;
   int y;
@@ -34,22 +36,19 @@ public class Char
   {
     this.grid = aGrid;
     this.instance = game;
-    this.map = ((Map)this.instance.maps.get(this.instance.currentMap));
+    this.map = this.instance.currentMap;
     this.sideLength = this.grid[1][1].x;
     System.out.println(this.sideLength);
     this.x = x2;
     this.y = y2;
-    setLayout(null);
-    setSize(this.sideLength, this.sideLength);
-    setLocation(this.grid[this.x][this.y]);
-    this.image = new ImagePanel(getSize());
-    System.out.println(getSize());
+    Point loc = GamePanel.grid[x][y];
+    this.image = new ImagePanel(new Rectangle(loc.x, loc.y, MainClass.UNIT_SIZE, MainClass.UNIT_SIZE));
     this.image.setImageWithName("derp/derpwizleft.png");
-    add(this.image);
-    setVisible(true);
-    setOpaque(false);
     this.dir = true;
     loadSpells();
+  }
+  public void draw(Graphics g) {
+	  image.draw(g);
   }
   
   public void moveLeft()
@@ -148,10 +147,10 @@ public class Char
     if (this.y < 0) {
       return true;
     }
-    if (this.x >= this.grid.length) {
+    if (this.x >= GamePanel.grid.length) {
       return true;
     }
-    if (this.y >= this.grid.length) {
+    if (this.y >= GamePanel.grid.length) {
       return true;
     }
     if (checkNonEnterableObjects(this.x, this.y)) {
@@ -163,7 +162,7 @@ public class Char
   public boolean checkNonEnterableObjects(int x, int y)
   {
     for (int i = 0; i < this.map.mapEntities.size(); i++) {
-      if ((((Entity)this.map.mapEntities.get(i)).location.equals(new Point(x, y))) && (!((Entity)this.map.mapEntities.get(i)).isEnterable())) {
+      if ((((Entity)this.map.mapEntities.get(i)).getLocation().equals(new Point(x, y))) && (!((Entity)this.map.mapEntities.get(i)).isEnterable())) {
         return true;
       }
     }
@@ -200,13 +199,13 @@ public class Char
       this.animating = false;
       interactWithSquare();
     }
-    if (Math.abs(Math.abs(this.xCoord) - Math.abs(this.grid[this.xDest][0].x)) < inc) {
-      this.xCoord = this.grid[this.xDest][0].x;
+    if (Math.abs(Math.abs(this.xCoord) - Math.abs(GamePanel.grid[this.xDest][0].x)) < inc) {
+      this.xCoord = GamePanel.grid[this.xDest][0].x;
     }
-    if (Math.abs(Math.abs(this.yCoord) - Math.abs(this.grid[0][this.yDest].y)) < inc) {
-      this.yCoord = this.grid[0][this.yDest].y;
+    if (Math.abs(Math.abs(this.yCoord) - Math.abs(GamePanel.grid[0][this.yDest].y)) < inc) {
+      this.yCoord = GamePanel.grid[0][this.yDest].y;
     }
-    setLocation(this.xCoord, this.yCoord);
+    image.setLocation(new Point(this.xCoord, this.yCoord));
   }
   
   public void changeLocation(Point gridCoords)
@@ -272,5 +271,8 @@ public class Char
       System.out.println("Well that wasn't supposed to happen");
     }
     return (String)spellContents.get(0);
+  }
+  public Point getLocation() {
+	  return new Point(x, y);
   }
 }

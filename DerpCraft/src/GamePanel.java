@@ -1,61 +1,57 @@
+import java.awt.Canvas;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
+import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashMap;
+
 import javax.swing.JPanel;
 
-public class GamePanel
-  extends JPanel
-  implements KeyListener
-{
-  public Point[][] grid = new Point[20][20];
+public class GamePanel extends Canvas implements KeyListener	{
+  public static Point[][] grid = new Point[MainClass.GRID_LENGTH][MainClass.GRID_LENGTH];
   public Char pChar;
-  String currentMap;
+  private BufferedImage back;
   String saveName;
   public HashMap<String, Map> maps = new HashMap();
+  public Map currentMap;
   ArrayList<String> mapsKeyList = new ArrayList();
   
   public GamePanel(String saveName)
   {
     setBackground(Color.DARK_GRAY);
-    setLayout(null);
     setPreferredSize(new Dimension(690, 690));
     initGrid();
     this.saveName = saveName;
-    this.currentMap = "firstMap.txt";
-    Map temp = new Map(this.currentMap, this.grid, this.saveName);
-    this.maps.put(temp.mapName, temp);
-    this.mapsKeyList.add(temp.mapName);
+    currentMap = new Map("firstMap.txt", this.grid, this.saveName);
+    this.maps.put(currentMap.mapName, currentMap);
+    this.mapsKeyList.add(currentMap.mapName);
     this.pChar = new Char(this.grid, 0, 0, this);
     addKeyListener(this);
     setFocusable(true);
-    add(this.pChar);
-    add((Component)this.maps.get(this.currentMap));
     setVisible(true);
   }
   
   public void changeMap(String name)
   {
-    remove((Component)this.maps.get(this.currentMap));
-    this.currentMap = name;
     if (this.maps.containsKey(name))
     {
-      add((Component)this.maps.get(this.currentMap));
+      currentMap = ((Map)this.maps.get(this.currentMap));
       this.pChar.instance = this;
-      this.pChar.map = ((Map)this.maps.get(this.currentMap));
+      this.pChar.map = currentMap;
       return;
     }
-    this.maps.put(this.currentMap, new Map(this.currentMap, this.grid, this.saveName));
-    this.mapsKeyList.add(this.currentMap);
-    add((Component)this.maps.get(this.currentMap));
+    this.maps.put(name, new Map(name, grid, this.saveName));
+    this.mapsKeyList.add(name);
     this.pChar.instance = this;
-    this.pChar.map = ((Map)this.maps.get(this.currentMap));
+    this.pChar.map = currentMap;
   }
   
   public void startGameLoop()
@@ -76,30 +72,41 @@ public class GamePanel
       revalidate();
     }
   }
+  public void update(Graphics graphics) {
+	  Graphics2D twoDGraph = (Graphics2D)graphics;
+	  if(back==null)
+		  back = (BufferedImage)(createImage(getWidth(),getHeight()));
+	  Graphics g = back.createGraphics();
+	  //todo: test for in-battle? not drawing the map while playing would give higher performance
+	  currentMap.draw(g);
+	  pChar.draw(g);
+	  
+	  twoDGraph.drawImage(back, null, 0, 0);
+  }
   
   public void initGrid()
   {
     int x = 700;
-    int increment = x / this.grid.length;
-    for (int i = 0; i < this.grid.length; i++) {
-      for (int j = 0; j < this.grid[i].length; j++)
+    int increment = x / grid.length;
+    for (int i = 0; i < grid.length; i++) {
+      for (int j = 0; j < grid[i].length; j++)
       {
-        this.grid[i][j] = new Point();
-        this.grid[i][j].x = (increment * i);
-        this.grid[i][j].y = (increment * j);
+        grid[i][j] = new Point();
+        grid[i][j].x = (increment * i);
+        grid[i][j].y = (increment * j);
       }
     }
   }
   
   public void initGrid(int sideLength)
   {
-    int increment = sideLength / this.grid.length;
-    for (int i = 0; i < this.grid.length; i++) {
-      for (int j = 0; j < this.grid[i].length; j++)
+    int increment = sideLength / grid.length;
+    for (int i = 0; i < grid.length; i++) {
+      for (int j = 0; j < grid[i].length; j++)
       {
-        this.grid[i][j] = new Point();
-        this.grid[i][j].x = (increment * i);
-        this.grid[i][j].y = (increment * j);
+        grid[i][j] = new Point();
+        grid[i][j].x = (increment * i);
+        grid[i][j].y = (increment * j);
       }
     }
   }

@@ -3,28 +3,21 @@ import java.awt.Point;
 import javax.swing.JPanel;
 
 public class Path
-  extends JPanel
+  extends Entity
 {
-  public boolean isEnterable = true;
-  public boolean interact = false;
-  Point gridCoords;
+	public static final int TYPE = 2;
   
-  public Path(Dimension size, Point gridCoords)
+  public Path(Point gridCoords)
   {
-    setLayout(null);
-    setSize(size);
-    setVisible(true);
-    setOpaque(false);
-    ImagePanel image = new ImagePanel(getSize());
+	  super(gridCoords);
+	  isEnterable = true;
     image.setImageWithName("cobble path.jpg");
-    this.gridCoords = gridCoords;
-    add(image);
   }
   
-  public static Entity loadEntity(String c, Point[][] grid)
+  public static Entity loadEntity(String c)
   {
     int[] coords = MainClass.loadCoords(c);
-    return new Entity(new Point(coords[0], coords[1]), 2, grid);
+    return new Path(new Point(coords[0], coords[1]));
   }
   
   public void interact() {}

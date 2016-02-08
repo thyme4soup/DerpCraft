@@ -9,6 +9,9 @@ import javax.swing.JFrame;
 
 public class MainClass
 {
+	static final int SIDE_LENGTH = 700;
+	static final int GRID_LENGTH = 20;
+	static final int UNIT_SIZE = SIDE_LENGTH / GRID_LENGTH; //35
   public static void main(String[] args)
   {
     JFrame frame = new JFrame();

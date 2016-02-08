@@ -1,6 +1,8 @@
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileReader;
@@ -8,10 +10,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
+
 import javax.swing.JPanel;
 
 public class Map
-  extends JPanel
 {
   public ImagePanel background;
   public Point[][] grid;
@@ -22,17 +24,18 @@ public class Map
   
   public Map(String mapName, Point[][] aGrid, String saveName)
   {
-    setBackground(Color.BLUE);
-    setLayout(null);
-    setSize(new Dimension(700, 700));
-    setVisible(true);
     this.grid = aGrid;
-    this.background = new ImagePanel(getSize());
+    this.background = new ImagePanel(new Rectangle(0, 0, 1000, 1000));
     this.saveName = saveName;
     this.background.setImageAsSquare(Color.DARK_GRAY);
     this.mapName = mapName;
     loadMap(this.mapName);
-    add(this.background);
+  }
+  public void draw(Graphics g) {
+	  background.draw(g);
+	  for(Entity e : mapEntities) {
+		  e.draw(g);
+	  }
   }
   
   public void loadMap(String map)
@@ -121,65 +124,62 @@ public class Map
   
   public void loadTree(String c)
   {
-    Entity temp = Tree.loadEntity(c, this.grid);
-    add(temp);
+    Entity temp = Tree.loadEntity(c);
     this.mapEntities.add(temp);
   }
   
   public void loadDoor(String c)
   {
-    Entity temp = Door.loadEntity(c, this.grid);
-    add(temp);
+    Entity temp = Door.loadEntity(c);
     this.mapEntities.add(temp);
   }
   
   public void loadPath(String c)
   {
-    Entity temp = Path.loadEntity(c, this.grid);
-    add(temp);
+    Entity temp = Path.loadEntity(c);
     this.mapEntities.add(temp);
   }
   
   public void loadEnterableImage(String c)
   {
-    Entity temp = EnterableImage.loadEntity(c, this.grid);
-    add(temp);
-    this.mapEntities.add(temp);
+    //Entity temp = EnterableImage.loadEntity(c, this.grid);
+    //add(temp);
+    //this.mapEntities.add(temp);
   }
   
   public void loadNonEnterableImage(String c)
   {
-    Entity temp = NonEnterableImage.loadEntity(c, this.grid);
-    add(temp);
-    this.mapEntities.add(temp);
+   // Entity temp = NonEnterableImage.loadEntity(c, this.grid);
+    //add(temp);
+   // this.mapEntities.add(temp);
   }
   
   public void loadFight(String c)
   {
-    Entity temp = Fight.loadEntity(c, this.grid);
-    add(temp);
-    this.mapEntities.add(temp);
+   // Entity temp = Fight.loadEntity(c, this.grid);
+   // add(temp);
+    //this.mapEntities.add(temp);
   }
   
   public void loadCutscene(String c)
   {
-    Entity temp = CutSceneEntity.loadEntity(c, this.grid);
-    add(temp);
-    this.mapEntities.add(temp);
+   // Entity temp = CutSceneEntity.loadEntity(c, this.grid);
+   // add(temp);
+   // this.mapEntities.add(temp);
   }
   
   public void loadItemPickUp(String c)
   {
-    Entity temp = ItemPickUp.loadEntity(c, this.grid);
-    add(temp);
-    this.mapEntities.add(temp);
+   // Entity temp = ItemPickUp.loadEntity(c, this.grid);
+   // add(temp);
+   // this.mapEntities.add(temp);
   }
   
   public void loadItemCheck(String c)
   {
-    Entity temp = ItemCheck.loadEntity(c, this.grid);
-    add(temp);
-    this.mapEntities.add(temp);
+   // Entity temp = ItemCheck.loadEntity(c, this.grid);
+   // add(temp);
+   // this.mapEntities.add(temp);
   }
   
   public void setupBackground(String mapBackground)
@@ -221,7 +221,7 @@ public class Map
   public void removeEntity(Entity ent)
   {
     this.mapEntities.remove(ent);
-    remove(ent);
+  //  remove(ent);
   }
   
   public String[] getMapContents()

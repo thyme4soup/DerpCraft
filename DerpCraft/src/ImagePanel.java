@@ -2,14 +2,15 @@ import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Image;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.io.File;
 import java.io.PrintStream;
+
 import javax.imageio.ImageIO;
 import javax.swing.JPanel;
 
 public class ImagePanel
-  extends JPanel
 {
   public Image image;
   public Image[] animationImages;
@@ -23,32 +24,17 @@ public class ImagePanel
   public boolean scale = false;
   public boolean flip = false;
   public String text;
-  
-  public ImagePanel(Dimension size)
-  {
-    setSize(size.width, size.height);
-    setOpaque(false);
-    this.drawIndicator = -1;
-    this.drawColor = Color.WHITE;
-    this.durationOfLoop = 0;
-    this.waitTime = 0;
-    this.image = null;
-    this.animationImages = null;
-    setLayout(null);
-  }
+  public Rectangle bounds;
   
   public ImagePanel(Rectangle bounds)
   {
-    setSize((int)bounds.getWidth(), (int)bounds.getHeight());
-    setLocation(bounds.getLocation());
-    setOpaque(false);
+    this.bounds = bounds;
     this.drawIndicator = -1;
     this.drawColor = Color.WHITE;
     this.durationOfLoop = 0;
     this.waitTime = 0;
     this.image = null;
     this.animationImages = null;
-    setLayout(null);
   }
   
   public void setImageAsGif(String[] names, int aDurationOfLoop, int aWaitTime)
@@ -74,7 +60,6 @@ public class ImagePanel
     {
       e.printStackTrace();
     }
-    repaint();
   }
   
   public void setImageAsGif(String[] names, int aDurationOfLoop, int aWaitTime, int x)
@@ -101,7 +86,6 @@ public class ImagePanel
     if (x == -1) {
       this.flip = true;
     }
-    repaint();
   }
   
   public void setImageWithName(String imageName, int x)
@@ -118,7 +102,6 @@ public class ImagePanel
     if (x == -1) {
       this.flip = true;
     }
-    repaint();
   }
   
   public void setImageWithName(String imageName)
@@ -132,54 +115,45 @@ public class ImagePanel
     {
       e.printStackTrace();
     }
-    repaint();
   }
   
   public void setImageAsCircle(Color c)
   {
     this.drawIndicator = 1;
     this.drawColor = c;
-    repaint();
   }
   
   public void setImageAsSquare(Color c)
   {
     this.drawIndicator = 2;
     this.drawColor = c;
-    repaint();
   }
   
   public void setImageAsText(String text, Color c)
   {
     this.drawIndicator = 4;
     this.drawColor = c;
-    repaint();
     this.text = text;
   }
   
-  public void paintComponent(Graphics g)
+  public void draw(Graphics g)
   {
-    super.paintComponent(g);
-    
     g.setColor(this.drawColor);
     Image im = this.image;
     switch (this.drawIndicator)
     {
     case 0: 
       if (this.flip) {
-        g.drawImage(im, 
-          im.getWidth(this), 0, 0, im.getHeight(this), 
-          0, 0, im.getWidth(this), im.getHeight(this), 
-          this);
+        g.drawImage(im, bounds.x + bounds.width, bounds.y, -bounds.width, bounds.height, null);
       } else {
-        g.drawImage(im, 0, 0, null);
+        g.drawImage(im, bounds.x, bounds.y, null);
       }
       break;
     case 1: 
-      g.fillOval(0, 0, getWidth(), getHeight());
+      g.fillOval(bounds.x, bounds.y, bounds.width, bounds.height);
       break;
     case 2: 
-      g.fillRect(0, 0, getWidth(), getHeight());
+      g.fillRect(bounds.x, bounds.y, bounds.width, bounds.height);
       break;
     case 3: 
       this.timer += 1;
@@ -193,17 +167,17 @@ public class ImagePanel
       }
       im = this.animationImages[this.animationCounter];
       if (this.flip) {
-        g.drawImage(im, 
-          im.getWidth(this), 0, 0, im.getHeight(this), 
-          0, 0, im.getWidth(this), im.getHeight(this), 
-          this);
+          g.drawImage(im, bounds.x + bounds.width, bounds.y, -bounds.width, bounds.height, null);
       } else {
-        g.drawImage(im, 0, 0, null);
+        g.drawImage(im, bounds.x, bounds.y, null);
       }
       break;
     case 4: 
-      g.drawString(this.text, getWidth() / 2 - this.text.length() * 7 / 2, getHeight() / 2);
+      g.drawString(this.text, bounds.width / 2 - this.text.length() * 7 / 2 + bounds.x, bounds.height / 2 + bounds.y);
       break;
     }
+  }
+  public void setLocation(Point p) {
+	  bounds.setLocation(p.x, p.y);
   }
 }

@@ -1,15 +1,17 @@
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Random;
+
 import javax.swing.JPanel;
 
 public class NPC
-  extends JPanel
 {
   Point coords = new Point(500, 650);
   Point velocity = new Point();
@@ -34,7 +36,7 @@ public class NPC
   int distance = 200;
   Ledge[] ledges;
   boolean jumped;
-  Dimension container;
+  Rectangle container;
   FightPanel panel;
   ImagePanel image;
   String imageLocation = "ManLeft.png";
@@ -44,10 +46,10 @@ public class NPC
   int delay = 0;
   ArrayList<String> spells = new ArrayList();
   
-  public NPC(Dimension aContainer, int aFR, Ledge[] aLedges, FightPanel aPanel, BattleChar aBC, String npc)
+  int height, width = 50;
+  
+  public NPC(Rectangle aContainer, int aFR, Ledge[] aLedges, FightPanel aPanel, BattleChar aBC, String npc)
   {
-    setLayout(null);
-    setSize(50, 50);
     this.bC = aBC;
     this.health = new Point(100, 100);
     this.ledges = aLedges;
@@ -59,13 +61,14 @@ public class NPC
     this.velocity.x = 0;
     this.velocity.y = 0;
     this.frameRate = 10;
-    setLocation(this.coords.x, this.coords.y);
-    this.image = new ImagePanel(getSize());
+    this.image = new ImagePanel(getBounds());
     this.image.setImageWithName(this.imageLocation);
     turn();
-    add(this.image);
-    setVisible(true);
-    setOpaque(false);
+  }
+  
+  public void draw(Graphics g) {
+	  updateLocation();
+	  image.draw(g);
   }
   
   public void loadInfo(String fileLocation)
@@ -94,7 +97,8 @@ public class NPC
     temp = getNext(n, (String)f.get(0), ';');
     temp2.y = Integer.valueOf(temp[0]).intValue();
     n = Integer.valueOf(temp[1]).intValue();
-    setSize(temp2.x, temp2.y);
+    width = temp2.x;
+    height = temp2.y;
     this.id = Integer.valueOf(getNext(n, (String)f.get(0), ';')[0]).intValue();
     System.out.println(this.id);
     n = 0;
@@ -249,9 +253,8 @@ public class NPC
   
   public void castSpell()
   {
-    Spell spell = new Spell(getLocation(), this.dir, this.id, this.panel, (String)this.spells.get(new Random().nextInt(this.spells.size())), this.frameRate);
+    Spell spell = new Spell(new Point(coords.x, coords.y), this.dir, this.id, this.panel, (String)this.spells.get(new Random().nextInt(this.spells.size())), this.frameRate);
     this.panel.castedSpells.add(spell);
-    this.panel.add(spell);
   }
   
   public void applyVelocity()
@@ -334,7 +337,7 @@ public class NPC
   
   public void turn()
   {
-    if (this.bC.getX() < getX())
+    if (this.bC.getX() < coords.x)
     {
       this.image.flip = false;
       this.image.setImageWithName(this.imageLocation);
@@ -351,11 +354,11 @@ public class NPC
   public Point updateVS(Point newCoords, boolean drop)
   {
     for (int i = 0; (i < this.ledges.length) && (!drop) && (this.velocity.y >= 0); i++) {
-      if ((newCoords.x + getWidth() > this.ledges[i].getX()) && (newCoords.x < this.ledges[i].getX() + this.ledges[i].getWidth()))
+      if ((newCoords.x + width > this.ledges[i].getX()) && (newCoords.x < this.ledges[i].getX() + this.ledges[i].getWidth()))
       {
         int tempY = newCoords.y;
         if ((this.velocity.y == 0) && 
-          (newCoords.y == this.ledges[i].getY() - getHeight()))
+          (newCoords.y == this.ledges[i].getY() - height))
         {
           this.velocity.y = 0;
           this.vS = true;
@@ -363,7 +366,7 @@ public class NPC
           return newCoords;
         }
         for (newCoords.y -= this.velocity.y; newCoords.y < tempY; newCoords.y += 1) {
-          if (newCoords.y == this.ledges[i].getY() - getHeight())
+          if (newCoords.y == this.ledges[i].getY() - height)
           {
             this.velocity.y = 0;
             this.vS = true;
@@ -376,23 +379,32 @@ public class NPC
     if (drop) {
       this.vS = false;
     }
-    if (newCoords.y >= this.container.height - getHeight())
+    if (newCoords.y >= this.container.height - height)
     {
-      newCoords.y = (this.container.height - getHeight());
+      newCoords.y = (this.container.height - height);
       this.vS = true;
       this.jumped = false;
       this.velocity.y = 0;
     }
     if (newCoords.x < 0) {
       newCoords.x = 0;
-    } else if (newCoords.x > this.container.width - getWidth()) {
-      newCoords.x = (this.container.width - getWidth());
+    } else if (newCoords.x > this.container.width - width) {
+      newCoords.x = (this.container.width - width);
     }
     return newCoords;
   }
   
+  public int getX() {
+	  return coords.x;
+  }
+  public int getY() {
+	  return coords.y;
+  }
   public void updateLocation()
   {
-    setLocation(this.coords.x, this.coords.y);
+    image.setLocation(new Point(this.coords.x, this.coords.y));
+  }
+  public Rectangle getBounds() {
+	  return new Rectangle(coords.x, coords.y, width, height);
   }
 }

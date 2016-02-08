@@ -4,35 +4,34 @@ import java.awt.Point;
 import javax.swing.JPanel;
 
 public class HealthBar
-  extends JPanel
 {
   Point health;
   String title;
-  int width;
+  Point location;
+  int width = 0;
+  public static final int WIDTH = 135;
+  public static final int HEIGHT = 35;
   
   public HealthBar(Point aHealth, Point location, String aTitle)
   {
-    setLayout(null);
-    setSize(150, 35);
-    setLocation(location.x, location.y);
-    setOpaque(false);
-    setVisible(true);
+	  this.location = location;
+    this.location = new Point(location.x, location.y);
     this.health = aHealth;
     this.title = aTitle;
     update();
   }
   
-  public void paintComponent(Graphics g)
+  public void draw(Graphics g)
   {
     g.setColor(Color.RED);
-    g.fillRect(1, 1, this.width, getHeight() - 1);
+    g.fillRect(location.x + 1, location.y + 1, this.width, HEIGHT - 1);
     g.setColor(Color.BLACK);
-    g.drawString(this.title, 5, getHeight() / 2 + 5);
-    g.drawRect(0, 0, getWidth() - 1, getHeight() - 1);
+    g.drawString(this.title, 5, HEIGHT / 2 + 5);
+    g.drawRect(location.x, location.y, WIDTH - 1, HEIGHT - 1);
   }
   
   public void update()
   {
-    this.width = (this.health.x * getWidth() / this.health.y);
+    this.width = (this.health.x * WIDTH / this.health.y);
   }
 }

@@ -1,13 +1,16 @@
 import java.awt.Dimension;
+import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.util.ArrayList;
 import java.util.Random;
+
 import javax.swing.JLayeredPane;
 import javax.swing.JPanel;
 
 public class BattleChar
-  extends JPanel
 {
+  public static final int SIDE_LENGTH = 50;
   Point coords = new Point();
   Point velocity = new Point();
   int id = 0;
@@ -26,7 +29,6 @@ public class BattleChar
   Ledge[] ledges;
   boolean jumped;
   FightPanel container;
-  Dimension c;
   ImagePanel image;
   ImagePanel dmg;
   JLayeredPane lP = new JLayeredPane();
@@ -39,25 +41,21 @@ public class BattleChar
   
   public BattleChar(FightPanel aContainer, int aFR, Point health)
   {
-    setLayout(null);
-    setSize(50, 50);
     this.health = health;
     this.vS = true;
     this.container = aContainer;
-    this.c = this.container.getSize();
     this.jumped = false;
     this.coords.x = 20;
-    this.coords.y = (this.c.height - getHeight());
+    this.coords.y = (MainClass.SIDE_LENGTH - SIDE_LENGTH);
     this.velocity.x = 0;
     this.velocity.y = 0;
     this.frameRate = aFR;
-    setLocation(this.coords.x, this.coords.y);
-    this.image = new ImagePanel(getSize());
+    this.image = new ImagePanel(new Rectangle(coords.x, coords.y, SIDE_LENGTH, SIDE_LENGTH));
     this.image.setImageWithName("derp/battlewizright.png");
-    this.dmg = new ImagePanel(getSize());
-    add(this.image);
-    setVisible(true);
-    setOpaque(false);
+    this.dmg = new ImagePanel(new Rectangle(coords.x, coords.y, SIDE_LENGTH, SIDE_LENGTH));
+  }
+  public void draw(Graphics g) {
+	  image.draw(g);
   }
   
   public void updateImage()
@@ -128,9 +126,8 @@ public class BattleChar
     for (int n = 1; n < this.container.spells.length; n++) {
       if (this.castingSequence.equals(this.container.spells[n][1]))
       {
-        Spell spell = new Spell(getLocation(), this.dir, this.id, this.container, this.container.spells[n][0], this.frameRate, this.castingTime);
+        Spell spell = new Spell(new Point(coords.x, coords.y), this.dir, this.id, this.container, this.container.spells[n][0], this.frameRate, this.castingTime);
         this.container.castedSpells.add(spell);
-        this.container.add(spell);
         stopCasting();
       }
     }
@@ -272,11 +269,11 @@ public class BattleChar
   {
     this.vS = false;
     for (int i = 0; (i < this.ledges.length) && (!drop) && (this.velocity.y >= 0); i++) {
-      if ((newCoords.x + getWidth() > this.ledges[i].getX()) && (newCoords.x < this.ledges[i].getX() + this.ledges[i].getWidth()))
+      if ((newCoords.x + SIDE_LENGTH > this.ledges[i].getX()) && (newCoords.x < this.ledges[i].getX() + this.ledges[i].getWidth()))
       {
         int tempY = newCoords.y;
         if ((this.velocity.y == 0) && 
-          (newCoords.y == this.ledges[i].getY() - getHeight()))
+          (newCoords.y == this.ledges[i].getY() - SIDE_LENGTH))
         {
           this.velocity.y = 0;
           this.vS = true;
@@ -286,7 +283,7 @@ public class BattleChar
         for (newCoords.y -= this.velocity.y; newCoords.y < tempY; newCoords.y += 1)
         {
           this.vS = false;
-          if (newCoords.y == this.ledges[i].getY() - getHeight())
+          if (newCoords.y == this.ledges[i].getY() - SIDE_LENGTH)
           {
             this.velocity.y = 0;
             this.vS = true;
@@ -299,10 +296,10 @@ public class BattleChar
     if (drop) {
       this.vS = false;
     }
-    if (newCoords.y >= this.c.height - getHeight()) {
+    if (newCoords.y >= MainClass.SIDE_LENGTH - SIDE_LENGTH) {
       if (!this.check)
       {
-        newCoords.y = (this.c.height - getHeight());
+        newCoords.y = (MainClass.SIDE_LENGTH - SIDE_LENGTH);
         this.vS = true;
         this.jumped = false;
         this.velocity.y = 0;
@@ -314,14 +311,21 @@ public class BattleChar
     }
     if (newCoords.x < 0) {
       newCoords.x = 0;
-    } else if (newCoords.x > this.c.width - getWidth()) {
-      newCoords.x = (this.c.width - getWidth());
+    } else if (newCoords.x > MainClass.SIDE_LENGTH - SIDE_LENGTH) {
+      newCoords.x = (MainClass.SIDE_LENGTH - SIDE_LENGTH);
     }
     return newCoords;
   }
-  
-  public void updateLocation()
-  {
-    setLocation(this.coords.x, this.coords.y);
+  public void updateLocation() {
+	  image.setLocation(coords);
+  }
+  public Rectangle getBounds() {
+	  return new Rectangle(coords.x, coords.y, SIDE_LENGTH, SIDE_LENGTH);
+  }
+  public int getX() {
+	  return coords.x;
+  }
+  public int getY() {
+	  return coords.y;
   }
 }

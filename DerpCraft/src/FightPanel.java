@@ -1,5 +1,6 @@
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
@@ -9,10 +10,10 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
+
 import javax.swing.JPanel;
 
 public class FightPanel
-  extends JPanel
   implements KeyListener
 {
   BattleChar bC;
@@ -26,38 +27,33 @@ public class FightPanel
   boolean drop = false;
   int waitCounter = 0;
   int frameRate = 10;
-  ImagePanel image;
+  ImagePanel background;
   ArrayList<NPC> npcs = new ArrayList();
   String[][] spells;
   ArrayList<Spell> castedSpells = new ArrayList();
   
   public FightPanel(GamePanel instance, String fightName)
   {
-    setBackground(Color.LIGHT_GRAY);
-    setLayout(null);
-    setSize(700, 700);
-    this.image = new ImagePanel(getSize());
-    add(this.image);
+    background = new ImagePanel(new Rectangle(0, 0, MainClass.SIDE_LENGTH, MainClass.SIDE_LENGTH));
     this.aInstance = instance;
     this.spells = instance.pChar.spells;
     this.bC = new BattleChar(this, 10, instance.pChar.health);
     loadFight(fightName);
     this.bC.ledges = this.ledges;
-    for (int i = 0; i < this.ledges.length; i++) {
-      add(this.ledges[i]);
-    }
     this.pcHealth = new HealthBar(instance.pChar.health, new Point(0, 0), "Derp");
-    add(this.pcHealth);
     for (int i = 0; i < this.npcs.size(); i++)
     {
-      add((Component)this.npcs.get(i));
-      this.health.add(new HealthBar(((NPC)this.npcs.get(i)).health, new Point(getWidth() - 151, 45 * i), "Enemy"));
-      add((Component)this.health.get(i));
+      this.health.add(new HealthBar(((NPC)this.npcs.get(i)).health, new Point(MainClass.SIDE_LENGTH - 151, 45 * i), "Enemy"));
     }
-    add(this.bC);
-    addKeyListener(this);
-    setFocusable(true);
-    setVisible(true);
+  }
+  public void draw(Graphics g) {
+	  background.draw(g);
+	  bC.draw(g);
+	  pcHealth.draw(g);
+	  for(NPC npc : npcs) npc.draw(g);
+	  for(Spell s : castedSpells) s.draw(g);
+	  for(Ledge l : ledges) l.draw(g);
+	  for(HealthBar h : health) h.draw(g);
   }
   
 	public void loadFight(String fight) {
@@ -101,7 +97,7 @@ public class FightPanel
 				names[j] = tempNames.get(j);
 				j++;
 			}
-			image.setImageAsGif(names, duration, frameRate);
+			this.background.setImageAsGif(names, duration, frameRate);
 			break;
 		case "color":
 			int[] color = new int[3];
@@ -116,8 +112,7 @@ public class FightPanel
 				n++;
 				color[l] = Integer.valueOf(temp2);
 			}
-			image = new ImagePanel(this.getSize());
-			image.setImageAsCircle(new Color(color[0], color[1], color[2]));
+			this.background.setImageAsCircle(new Color(color[0], color[1], color[2]));
 			break;
 		default:
 			System.out.println("Unknown command: "+temp+". Try 'gif: ' or 'color: ', or check other spells");
@@ -169,8 +164,6 @@ public class FightPanel
   
   public void startLoop()
   {
-    requestFocus();
-    repaint();
     try
     {
       Thread.sleep(1500L);
@@ -202,8 +195,7 @@ public class FightPanel
         ((HealthBar)this.health.get(i)).update();
       }
       updateDeadNPCs();
-      repaint();
-      if (this.bC.getY() >= getHeight() * 2) {
+      if (this.bC.getY() >= MainClass.SIDE_LENGTH * 2) {
         break;
       }
     } while (!this.win);
@@ -218,23 +210,19 @@ public class FightPanel
         e.printStackTrace();
       }
       this.waitCounter += this.frameRate;
-      repaint();
-      revalidate();
     }
   }
   
   public void updateDeadNPCs()
   {
     for (int i = 0; i < this.npcs.size(); i++) {
-      if ((((NPC)this.npcs.get(i)).dead) && (((NPC)this.npcs.get(i)).getY() > getHeight() * 2))
+      if ((((NPC)this.npcs.get(i)).dead) && (((NPC)this.npcs.get(i)).getY() > MainClass.SIDE_LENGTH * 2))
       {
-        remove((Component)this.npcs.get(i));
         this.npcs.remove(this.npcs.get(i));
-        remove((Component)this.health.get(i));
         
         this.health.remove(this.health.get(i));
         for (int j = i; j < this.health.size(); j++) {
-          ((HealthBar)this.health.get(j)).setLocation(getWidth() - 151, 45 * j);
+          ((HealthBar)this.health.get(j)).setLocation(MainClass.SIDE_LENGTH - 151, 45 * j);
         }
       }
     }
@@ -250,7 +238,6 @@ public class FightPanel
       if ((((Spell)this.castedSpells.get(i)).getBounds().intersects(this.bC.getBounds())) && (((Spell)this.castedSpells.get(i)).id != this.bC.id))
       {
         ((Spell)this.castedSpells.get(i)).interact(this.bC);
-        remove((Component)this.castedSpells.get(i));
         this.castedSpells.remove(this.castedSpells.get(i));
         if (i > 0) {
           i--;
@@ -260,7 +247,6 @@ public class FightPanel
         if ((((Spell)this.castedSpells.get(i)).getBounds().intersects(((NPC)this.npcs.get(j)).getBounds())) && (((Spell)this.castedSpells.get(i)).id != ((NPC)this.npcs.get(j)).id))
         {
           ((Spell)this.castedSpells.get(i)).interact((NPC)this.npcs.get(j));
-          remove((Component)this.castedSpells.get(i));
           this.castedSpells.remove(this.castedSpells.get(i));
           if (j > 0) {
             j--;
@@ -271,6 +257,9 @@ public class FightPanel
         }
       }
     }
+  }
+  public Rectangle getSize() {
+	  return new Rectangle(0, 0, MainClass.SIDE_LENGTH, MainClass.SIDE_LENGTH);
   }
   
   public void keyPressed(KeyEvent arg0)
@@ -310,12 +299,6 @@ public class FightPanel
       break;
     case 40: 
       this.drop = false;
-      break;
-    case 74: 
-      this.npcs.add(new NPC(getSize(), this.frameRate, this.ledges, this, this.bC, "enemies/pelvicMan"));
-      add((Component)this.npcs.get(this.npcs.size() - 1));
-      this.health.add(new HealthBar(((NPC)this.npcs.get(this.npcs.size() - 1)).health, new Point(getWidth() - 151, 45 * (this.npcs.size() - 1)), "Enemy"));
-      add((Component)this.health.get(this.health.size() - 1));
       break;
     case 16: 
       break;
